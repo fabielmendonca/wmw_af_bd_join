@@ -1,0 +1,50 @@
+CREATE TABLE Representantes (
+	codigo_representante INT PRIMARY KEY IDENTITY,
+	nome_representante VARCHAR(50)
+	);
+
+
+CREATE TABLE Pedidos (
+	numero_pedido INT PRIMARY KEY IDENTITY,
+	valor_pedido DECIMAL(16,3),
+	codigo_representante INT NULL,
+	CONSTRAINT fk_codigo_representante
+	  FOREIGN KEY(codigo_representante)
+	    REFERENCES Representantes(codigo_representante)
+	);
+
+
+INSERT INTO Representantes (nome_representante) VALUES ('Fausto Silva');
+INSERT INTO Representantes (nome_representante) VALUES ('Luciano Huck');
+INSERT INTO Representantes (nome_representante) VALUES ('Silvio Santos');
+INSERT INTO Representantes (nome_representante) VALUES ('Danilo Gentilli');
+
+
+INSERT INTO Pedidos (valor_pedido, codigo_representante) VALUES (1700, 1);
+INSERT INTO Pedidos (valor_pedido, codigo_representante) VALUES (2840, 3);
+INSERT INTO Pedidos (valor_pedido, codigo_representante) VALUES (940, NULL);
+INSERT INTO Pedidos (valor_pedido, codigo_representante) VALUES (1600, 4);
+
+
+SELECT * 
+FROM pedidos p
+inner join REPRESENTANTES r
+  on p.codigo_representante = r.codigo_representante
+  
+
+SELECT * 
+FROM pedidos p
+left join REPRESENTANTES r
+  on p.codigo_representante = r.codigo_representante
+  
+  
+SELECT * 
+FROM pedidos p
+right join REPRESENTANTES r
+  on p.codigo_representante = r.codigo_representante
+  
+
+SELECT * 
+FROM pedidos p
+full outer join REPRESENTANTES r
+  on p.codigo_representante = r.codigo_representante
