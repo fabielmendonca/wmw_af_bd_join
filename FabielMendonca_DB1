@@ -1,0 +1,100 @@
+/* 
+Crie uma nova tabela chamada Cliente, com as colunas cdCliente (inteiro), 
+nmCliente (texto de 100 caracteres), dtFundacao (data), 
+vlLimiteCredito (decimal tamanho de 16 casas decimais e precisão de 9), 
+dtUltimoPedido (data), flAtivo (texto de 1 caractere). 
+A coluna cdCliente define a chave primária.
+*/
+CREATE TABLE Cliente (
+	cdCliente INT,
+	nmCliente VARCHAR(100),
+	dtFundacao DATE,
+	vlLimiteCredito DECIMAL(16,9),
+	dtUltimoPedido DATE,
+	flAtivo CHAR(1),
+	PRIMARY KEY(cdCliente)
+);
+
+
+
+/* Altere para 999 o tamanho da coluna nmCliente. */
+ALTER TABLE Cliente ALTER COLUMN nmCliente VARCHAR(999);
+
+
+/* Insira 6 registros na tabela. */
+INSERT INTO Cliente VALUES (1, 'DELL COMPUTER INC', '19840201', 10000, '20210131', 1);
+INSERT INTO Cliente VALUES (2, 'MICROSOFT CORPORATION', '19750404', 9000, '20210301', 1);
+INSERT INTO Cliente VALUES (3, 'APPLE INC', '19760401', 7000, '20210210', 1);
+INSERT INTO Cliente VALUES (4, 'TESLA, INC', '20030701', 15000, '20210305', 1);
+INSERT INTO Cliente VALUES (5, 'ORACLE CORPORATION', '19770616', 3000, '20201230', 1);
+INSERT INTO Cliente VALUES (6, 'INTERNATIONAL BUSINESS MACHINES CORP', '19110616', 1000, '20201201', 1);
+
+
+/*  Liste todos os clientes ordenados pelo limite de crédito (do maior para o menor), 
+apresentando apenas as informações de código, nome e valor de limite de crédito. */
+SELECT cdCliente Código, nmCliente 'Nome Cliente', CAST(vlLimiteCredito AS DEC(16,2)) 'Valor Limite Crédito'
+FROM Cliente ORDER BY vlLimiteCredito DESC 
+
+
+/* Liste o terceiro cliente cadastrado. */
+SELECT * FROM Cliente ORDER BY cdCliente OFFSET 2 ROWS FETCH NEXT 1 ROWS ONLY;
+SELECT * FROM Cliente WHERE cdCliente = 3;
+
+
+/* Altere o valor do limite de crédito do segundo cliente inserido para 45000,00. */
+UPDATE Cliente SET vlLimiteCredito = 45000 
+WHERE cdCliente = 2
+
+
+/* Liste todos os clientes que tenham no nome o fragmento de texto “Merca”. */
+SELECT * FROM Cliente WHERE nmCliente LIKE '%Merca%';
+SELECT * FROM Cliente WHERE nmCliente LIKE '%corp%';
+
+
+/* Some o valor de limite de crédito de todos os clientes. */
+SELECT CAST(SUM(vlLimiteCredito) AS DEC(16,2)) 'Soma Valor Limite Crédito' FROM Cliente;
+
+
+/* Altere a data de fundação do terceiro cliente para 01/05/1921. */
+UPDATE Cliente SET dtFundacao = '19210501' WHERE cdCliente = 3;
+
+
+/* Elimine o primeiro cliente. */
+DELETE FROM Cliente WHERE cdCliente = 1;
+
+
+/*Liste todas as informações de todos os clientes, ordenando pelo código (menor para maior). */
+SELECT * FROM Cliente ORDER BY cdCliente ASC;
+
+
+/* Conte quantos clientes estão ativos. */
+SELECT COUNT(cdCliente) 'Qtde Clientes' FROM Cliente WHERE flAtivo = 1;
+
+
+/* Conte o número de clientes acima de 10000,00 de limite de crédito. */
+SELECT COUNT(cdCliente) 'Qtde Clientes' FROM Cliente WHERE vlLimiteCredito > 10000;
+
+
+/* 
+Crie uma view listando os registros da tabela Cliente unindo o nome do cliente
+com o código do cliente no mesmo campo, além desses campos, deve ser mostrado 
+também no resultado da consulta os campos data de fundação e ativo.
+*/
+CREATE VIEW view_cod_cliente AS
+SELECT CONCAT(cdCliente, ' ', nmCliente) 'Cód./Cliente', dtFundacao, flAtivo FROM Cliente
+
+
+/*
+Crie uma view listando os registros da tabela Cliente, neste retorno deve ser apresentado 
+as colunas nmCliente, dtUltimoPedido e também um campo chamado diferencaUltimoPedido que 
+irá ser a diferença (em dias) da data atual para o campo dtUltimoPedido.
+*/
+CREATE VIEW view_qtdDiasUltimoPedido AS
+SELECT nmCliente, dtUltimoPedido, DATEDIFF(DD, dtUltimoPedido, GETDATE()) AS diferencaUltimoPedido  FROM Cliente
+
+
+
+/* Elimine a coluna dtUltimoPedido da tabela */
+ALTER TABLE Cliente DROP COLUMN dtUltimoPedido;
+
+
