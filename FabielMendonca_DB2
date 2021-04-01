@@ -1,0 +1,76 @@
+/* FabielMendonca_BD2 - atividade do curso Integracao HDE - AF Banco de Dados */
+
+
+/*
+Crie uma tabela chamada RedeCliente com os campos cdRedeCliente(inteiro), 
+nmRedeCliente (texto de 100 caracteres), dtVinculoClienteRede(data), 
+vlMinPedido(decimal tamanho de 16 casas decimais e precisão de 9), 
+cdCliente(inteiro). As colunas cdRedeCliente e cdCliente são a chave da tabela.
+*/
+CREATE TABLE RedeCliente (
+cdRedeCliente INT,
+nmRedeCliente VARCHAR(100),
+dtVinculoClienteRede DATE,
+vlMinPedido DECIMAL(16,9), 
+cdCliente INT,
+PRIMARY KEY(cdRedeCliente, cdCliente));
+
+
+
+/*
+Crie uma chave estrangeira que vincule a coluna cdCliente da tabela RedeCliente 
+com a coluna cdCliente da tabela de Cliente.
+*/
+ALTER TABLE RedeCliente 
+ADD CONSTRAINT fk_cdCliente_Cliente FOREIGN KEY (cdCliente)
+REFERENCES Cliente (cdCliente)
+
+
+/* Insira 3 registros na tabela RedeCliente. */
+INSERT INTO RedeCliente VALUES (1, 'Tecnologia', '20100101', 1000, 2);
+INSERT INTO RedeCliente VALUES (1, 'Tecnologia', '20100101', 1000, 3);
+INSERT INTO RedeCliente VALUES (2, 'Automóvel', '20100101', 1000, 4);
+
+
+/* Traga apenas os clientes que estejam vinculados a uma rede. */
+SELECT * FROM Cliente C
+INNER JOIN RedeCliente R ON C.cdCliente = R.cdCliente
+
+
+/* Execute um select que retorne todos os registros das duas tabelas ao mesmo tempo (RedeCliente e Cliente). */
+SELECT * FROM Cliente C
+FULL OUTER JOIN RedeCliente R ON C.cdCliente = R.cdCliente 
+
+
+/* Liste todos as redes de clientes e o código dos clientes da rede. */
+SELECT cdRedeCliente, nmRedeCliente, cdCliente FROM RedeCliente
+
+
+/* Liste todos as redes de clientes e a quantidade de clientes que pertence a rede. */
+SELECT nmRedeCliente, COUNT(cdCliente) 'Qtde. Clientes da Rede' FROM RedeCliente GROUP BY nmRedeCliente
+
+
+/* Liste todos os clientes, valor total de limite de crédito e o código da rede que o cliente esta. */
+SELECT C.nmCliente, (select SUM(vlLimiteCredito) from Cliente) 'Valor Total Limite', R.cdRedeCliente 
+FROM Cliente C LEFT JOIN RedeCliente R ON R.cdCliente = C.cdCliente
+
+
+
+/* Crie uma nova coluna chamada qtTempoFundacao (inteiro) na tabela cliente. */
+ALTER TABLE Cliente ADD qtTempoFundacao INT
+
+
+/* Atualize o campo qtTempoFundacao baseando-se no campo dtFundacao, 
+o campo qtTempoFundacao deve ser representado aqui como anos. */
+UPDATE Cliente SET qtTempoFundacao = DATEDIFF(YY, dtFundacao, GETDATE()) 
+
+
+/* Faça uma consulta que retorne a soma de todos os vlLimiteCredito dos clientes ativos e que tenham mais de 30 anos de data de fundação.*/
+SELECT SUM(vlLimiteCredito) SomaValorLimite FROM Cliente
+WHERE flAtivo =1 AND qtTempoFundacao > 30
+
+
+/* Crie uma view para listar o código do cliente, o nome do cliente e a idade da data de fundação com base na data atual (mostrar a diferença em meses).*/
+CREATE VIEW view_idade_fundacao AS
+SELECT cdCliente, nmCliente, DATEDIFF(mm, dtFundacao, GETDATE()) AS idadeFundacao 
+FROM Cliente
